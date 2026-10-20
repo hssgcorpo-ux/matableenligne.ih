@@ -56,7 +56,7 @@ export async function signUp(formData: FormData) {
   });
 
   if (insertError) {
-    return { error: insertError.message };
+    redirect(`/signup?error=${encodeURIComponent(insertError.message)}`);
   }
 
   redirect("/dashboard");
@@ -110,11 +110,11 @@ export async function updateRestaurant(formData: FormData) {
     .eq("user_id", user.id);
 
   if (error) {
-    return { error: error.message };
+    redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
   }
 
   revalidatePath("/dashboard");
-  return { success: true };
+  redirect("/dashboard?success=1");
 }
 
 // --- MENU ----------------------------------------------------
@@ -132,7 +132,9 @@ export async function addMenuItem(formData: FormData) {
     .eq("user_id", user.id)
     .single();
 
-  if (!restaurant) return { error: "Restaurant introuvable." };
+  if (!restaurant) {
+    redirect("/dashboard?error=Restaurant%20introuvable.");
+  }
 
   const { error } = await supabase.from("menu_items").insert({
     restaurant_id: restaurant.id,
@@ -142,7 +144,9 @@ export async function addMenuItem(formData: FormData) {
     price: Number(formData.get("price") || 0),
   });
 
-  if (error) return { error: error.message };
+  if (error) {
+    redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  }
 
   revalidatePath("/dashboard");
 }
@@ -157,7 +161,9 @@ export async function deleteMenuItem(formData: FormData) {
   const id = String(formData.get("id") || "");
   const { error } = await supabase.from("menu_items").delete().eq("id", id);
 
-  if (error) return { error: error.message };
+  if (error) {
+    redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  }
 
   revalidatePath("/dashboard");
 }

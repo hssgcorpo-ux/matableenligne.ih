@@ -3,7 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { addMenuItem, deleteMenuItem, signOut, updateRestaurant } from "@/app/actions";
 import type { MenuItem, Restaurant } from "@/lib/types";
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: { error?: string; success?: string };
+}) {
   const supabase = createClient();
   const {
     data: { user },
@@ -55,6 +59,17 @@ export default async function DashboardPage() {
       </header>
 
       <div className="mx-auto mt-8 max-w-4xl space-y-8 px-6">
+        {searchParams.error && (
+          <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            {searchParams.error}
+          </p>
+        )}
+        {searchParams.success && (
+          <p className="rounded-lg bg-green-50 px-4 py-3 text-sm text-green-700">
+            Modifications enregistrées.
+          </p>
+        )}
+
         {/* Infos générales */}
         <section className="rounded-2xl bg-white p-6 shadow-sm">
           <h2 className="font-serif text-xl font-bold">
