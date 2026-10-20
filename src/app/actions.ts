@@ -2,7 +2,21 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
+import Stripe from "stripe";
 import { createClient } from "@/lib/supabase/server";
+
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2024-06-20",
+  });
+}
+
+function getBaseUrl() {
+  const host = headers().get("host") || "localhost:3000";
+  const proto = host.includes("localhost") ? "http" : "https";
+  return `${proto}://${host}`;
+}
 
 function slugify(input: string) {
   return input
@@ -238,6 +252,89 @@ export async function addRestaurantPhoto(formData: FormData) {
   }
 
   revalidatePath("/dashboard");
+}
+
+// --- ABONNEMENT (STRIPE) ---------------------------------------
+
+export async function createCheckoutSession() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("*")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!restaurant) {
+    redirect("/dashboard?error=Restaurant%20introuvable.");
+  }
+
+  const stripe = getStripe();
+  const baseUrl = getBaseUrl();
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    customer_email: restaurant.email || user.email || undefined,
+    line_items: [
+      {
+        price_data: {
+          currency: "eur",
+          product_data: { name: "Abonnement TableEnLigne" },
+          unit_amount: 1900,
+          recurring: { interval: "month" },
+        },
+        quantity: 1,
+      },
+      {
+        price_data: {
+          currency: "eur",
+          product_data: { name: "Mise en service (paiement unique)" },
+          unit_amount: 4900,
+        },
+        quantity: 1,
+      },
+    ],
+    success_url: `${baseUrl}/dashboard?success=paiement`,
+    cancel_url: `${baseUrl}/dashboard?error=${encodeURIComponent(
+      "Paiement annulé."
+    )}`,
+    metadata: { restaurant_id: restaurant.id },
+  });
+
+  if (session.url) redirect(session.url);
+  redirect("/dashboard?error=Impossible%20de%20démarrer%20le%20paiement.");
+}
+
+export async function createPortalSession() {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("stripe_customer_id")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!restaurant?.stripe_customer_id) {
+    redirect("/dashboard?error=Aucun%20abonnement%20actif.");
+  }
+
+  const stripe = getStripe();
+  const baseUrl = getBaseUrl();
+
+  const session = await stripe.billingPortal.sessions.create({
+    customer: restaurant.stripe_customer_id,
+    return_url: `${baseUrl}/dashboard`,
+  });
+
+  redirect(session.url);
 }
 
 export async function deleteRestaurantPhoto(formData: FormData) {

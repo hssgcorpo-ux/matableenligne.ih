@@ -28,6 +28,11 @@ alter table public.restaurants add column if not exists theme text not null defa
 -- Nom de domaine personnalisé que le restaurant peut connecter (optionnel)
 alter table public.restaurants add column if not exists custom_domain text unique;
 
+-- Abonnement Stripe
+alter table public.restaurants add column if not exists stripe_customer_id text;
+alter table public.restaurants add column if not exists stripe_subscription_id text;
+alter table public.restaurants add column if not exists subscription_status text not null default 'inactive';
+
 -- Table des plats / éléments de menu, rattachés à un restaurant
 create table if not exists public.menu_items (
   id uuid primary key default gen_random_uuid(),

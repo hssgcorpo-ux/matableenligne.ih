@@ -3,6 +3,8 @@ import { createClient } from "@/lib/supabase/server";
 import {
   addMenuItem,
   addRestaurantPhoto,
+  createCheckoutSession,
+  createPortalSession,
   deleteMenuItem,
   deleteRestaurantPhoto,
   signOut,
@@ -86,6 +88,35 @@ export default async function DashboardPage({
             Modifications enregistrées.
           </p>
         )}
+
+        {/* Abonnement */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="font-serif text-xl font-bold">Abonnement</h2>
+          {restaurant.subscription_status === "active" ? (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-sm text-green-700">
+                ✅ Abonnement actif — 19€/mois
+              </p>
+              <form action={createPortalSession}>
+                <button className="rounded-full border border-brand-dark/20 px-5 py-2 text-sm font-semibold transition hover:bg-brand-dark/5">
+                  Gérer mon abonnement
+                </button>
+              </form>
+            </div>
+          ) : (
+            <div className="mt-4">
+              <p className="text-sm text-brand-dark/60">
+                Votre site est en ligne, mais l&apos;abonnement n&apos;est pas encore
+                actif. 19€/mois + 49€ de mise en service, une seule fois.
+              </p>
+              <form action={createCheckoutSession} className="mt-3">
+                <button className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90">
+                  Activer mon abonnement
+                </button>
+              </form>
+            </div>
+          )}
+        </section>
 
         {/* Infos générales */}
         <section className="rounded-2xl bg-white p-6 shadow-sm">
