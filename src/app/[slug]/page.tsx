@@ -22,10 +22,15 @@ export default async function RestaurantPage({
 
   if (!restaurant) notFound();
 
-  // La page publique n'est visible que si l'abonnement est actif — le
-  // restaurant peut préparer son site gratuitement, mais doit payer pour
-  // que ses clients puissent le voir.
-  if (restaurant.subscription_status !== "active") {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const isOwner = user?.id === restaurant.user_id;
+
+  // La page publique n'est visible par les visiteurs que si l'abonnement est
+  // actif — mais le propriétaire doit pouvoir prévisualiser sa page avant de
+  // payer, donc on le laisse passer avec une bannière d'aperçu.
+  if (restaurant.subscription_status !== "active" && !isOwner) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center bg-brand-cream px-6 text-center">
         <p className="font-serif text-2xl font-bold text-brand-dark">
@@ -69,6 +74,13 @@ export default async function RestaurantPage({
       className="min-h-screen font-sans"
       style={{ background: theme.bg, color: cream }}
     >
+      {restaurant.subscription_status !== "active" && isOwner && (
+        <div className="bg-amber-400 px-6 py-2 text-center text-xs font-semibold text-amber-950">
+          👀 Aperçu uniquement — cette page n&apos;est pas visible par vos
+          clients tant que l&apos;abonnement n&apos;est pas activé.
+        </div>
+      )}
+
       {/* Barre de navigation sticky */}
       <div
         className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 backdrop-blur"
