@@ -11,6 +11,7 @@ export type Restaurant = {
   opening_hours: string | null;
   cover_image_url: string | null;
   logo_url: string | null;
+  theme: string;
 };
 
 export type MenuItem = {

@@ -2,6 +2,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { addMenuItem, deleteMenuItem, signOut, updateRestaurant } from "@/app/actions";
 import type { MenuItem, Restaurant } from "@/lib/types";
+import { THEMES } from "@/lib/themes";
+import { ImageUpload } from "@/components/ImageUpload";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function DashboardPage({
   searchParams,
@@ -99,21 +102,41 @@ export default async function DashboardPage({
               textarea
               placeholder={"Lun-Ven : 12h-14h / 19h-22h\nSam-Dim : 19h-23h"}
             />
-            <Field
-              label="Image de couverture (URL)"
+            <ImageUpload
+              label="Image de couverture"
               name="cover_image_url"
               defaultValue={restaurant.cover_image_url ?? ""}
             />
-            <Field
-              label="Logo (URL)"
+            <ImageUpload
+              label="Logo"
               name="logo_url"
               defaultValue={restaurant.logo_url ?? ""}
             />
 
             <div className="sm:col-span-2">
-              <button className="rounded-full bg-brand px-6 py-2.5 font-semibold text-white transition hover:bg-brand/90">
+              <label className="block text-sm font-medium">
+                Thème de la page
+              </label>
+              <select
+                name="theme"
+                defaultValue={restaurant.theme ?? "classique"}
+                className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 text-sm outline-none focus:border-brand sm:w-auto"
+              >
+                {Object.entries(THEMES).map(([key, t]) => (
+                  <option key={key} value={key}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="sm:col-span-2">
+              <SubmitButton
+                pendingText="Enregistrement..."
+                className="rounded-full bg-brand px-6 py-2.5 font-semibold text-white transition hover:bg-brand/90 disabled:opacity-60"
+              >
                 Enregistrer
-              </button>
+              </SubmitButton>
             </div>
           </form>
         </section>

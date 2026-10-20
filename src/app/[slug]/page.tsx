@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { MenuItem, Restaurant } from "@/lib/types";
+import { getTheme } from "@/lib/themes";
 
 export const revalidate = 60;
 
@@ -34,11 +35,13 @@ export default async function RestaurantPage({
     groups.set(item.category, list);
   }
 
+  const theme = getTheme(restaurant.theme);
+
   return (
-    <main className="min-h-screen bg-brand-cream">
+    <main className={`min-h-screen ${theme.pageBg}`}>
       {/* Hero */}
       <section
-        className="flex min-h-[40vh] flex-col items-center justify-center bg-brand-dark px-6 text-center text-white"
+        className={`flex min-h-[40vh] flex-col items-center justify-center ${theme.heroBg} px-6 text-center text-white`}
         style={
           restaurant.cover_image_url
             ? {
@@ -80,7 +83,7 @@ export default async function RestaurantPage({
           <div className="space-y-10">
             {Array.from(groups.entries()).map(([category, items]) => (
               <div key={category}>
-                <h3 className="mb-3 text-sm font-semibold uppercase tracking-widest text-brand">
+                <h3 className={`mb-3 text-sm font-semibold uppercase tracking-widest ${theme.accent}`}>
                   {category}
                 </h3>
                 <ul className="space-y-4">
@@ -111,7 +114,7 @@ export default async function RestaurantPage({
         <div className="grid gap-6 rounded-2xl bg-white p-6 shadow-sm sm:grid-cols-2">
           {restaurant.address && (
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-brand/80">
+              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
                 Adresse
               </p>
               <p className="mt-1">{restaurant.address}</p>
@@ -119,7 +122,7 @@ export default async function RestaurantPage({
           )}
           {restaurant.opening_hours && (
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-brand/80">
+              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
                 Horaires
               </p>
               <p className="mt-1 whitespace-pre-line">{restaurant.opening_hours}</p>
@@ -127,7 +130,7 @@ export default async function RestaurantPage({
           )}
           {restaurant.phone && (
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-brand/80">
+              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
                 Téléphone
               </p>
               <p className="mt-1">{restaurant.phone}</p>
@@ -135,7 +138,7 @@ export default async function RestaurantPage({
           )}
           {restaurant.email && (
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-brand/80">
+              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
                 Email
               </p>
               <p className="mt-1">{restaurant.email}</p>

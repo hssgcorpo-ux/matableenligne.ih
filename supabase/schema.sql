@@ -17,9 +17,13 @@ create table if not exists public.restaurants (
   opening_hours text,
   cover_image_url text,
   logo_url text,
+  theme text not null default 'classique',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Ajoute la colonne thème si la table existait déjà sans elle
+alter table public.restaurants add column if not exists theme text not null default 'classique';
 
 -- Table des plats / éléments de menu, rattachés à un restaurant
 create table if not exists public.menu_items (
@@ -97,4 +101,40 @@ create policy "menu_items_owner_delete"
       select 1 from public.restaurants r
       where r.id = restaurant_id and r.user_id = auth.uid()
     )
+  );
+
+-- ============================================================
+-- Stockage des images (logo, photo de couverture)
+-- ============================================================
+
+insert into storage.buckets (id, name, public)
+values ('restaurant-media', 'restaurant-media', true)
+on conflict (id) do nothing;
+
+-- Tout le monde peut voir les images (nécessaire pour la page publique)
+create policy "restaurant_media_public_read"
+  on storage.objects for select
+  using (bucket_id = 'restaurant-media');
+
+-- Chacun ne peut déposer des fichiers que dans son propre dossier
+-- (nommé d'après son identifiant utilisateur)
+create policy "restaurant_media_owner_insert"
+  on storage.objects for insert
+  with check (
+    bucket_id = 'restaurant-media'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "restaurant_media_owner_update"
+  on storage.objects for update
+  using (
+    bucket_id = 'restaurant-media'
+    and (storage.foldername(name))[1] = auth.uid()::text
+  );
+
+create policy "restaurant_media_owner_delete"
+  on storage.objects for delete
+  using (
+    bucket_id = 'restaurant-media'
+    and (storage.foldername(name))[1] = auth.uid()::text
   );

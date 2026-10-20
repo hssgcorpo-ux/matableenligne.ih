@@ -122,6 +122,7 @@ export async function updateRestaurant(formData: FormData) {
     opening_hours: String(formData.get("opening_hours") || ""),
     cover_image_url: String(formData.get("cover_image_url") || ""),
     logo_url: String(formData.get("logo_url") || ""),
+    theme: String(formData.get("theme") || "classique"),
     updated_at: new Date().toISOString(),
   };
 
