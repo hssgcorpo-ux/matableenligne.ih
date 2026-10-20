@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
     const restaurantId = session.metadata?.restaurant_id;
 
     if (restaurantId) {
-      await supabase
+      const { error } = await supabase
         .from("restaurants")
         .update({
           stripe_customer_id: String(session.customer || ""),
@@ -48,6 +48,10 @@ export async function POST(req: NextRequest) {
           subscription_status: "active",
         })
         .eq("id", restaurantId);
+
+      if (error) {
+        console.error("WEBHOOK update (checkout.session.completed) error:", error);
+      }
     }
   }
 
@@ -55,10 +59,14 @@ export async function POST(req: NextRequest) {
     const subscription = event.data.object as Stripe.Subscription;
     const status = event.type === "customer.subscription.deleted" ? "canceled" : subscription.status;
 
-    await supabase
+    const { error } = await supabase
       .from("restaurants")
       .update({ subscription_status: status })
       .eq("stripe_subscription_id", subscription.id);
+
+    if (error) {
+      console.error("WEBHOOK update (customer.subscription.*) error:", error);
+    }
   }
 
   return NextResponse.json({ received: true });
