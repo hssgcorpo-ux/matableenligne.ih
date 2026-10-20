@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signUp } from "@/app/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default function SignupPage({
   searchParams,
@@ -58,12 +59,12 @@ export default function SignupPage({
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand/90"
+          <SubmitButton
+            pendingText="Création en cours..."
+            className="w-full rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand/90 disabled:opacity-60"
           >
             Créer mon compte
-          </button>
+          </SubmitButton>
         </form>
 
         <p className="mt-6 text-center text-sm text-brand-dark/60">

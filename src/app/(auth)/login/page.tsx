@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signIn } from "@/app/actions";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default function LoginPage({
   searchParams,
@@ -13,6 +14,12 @@ export default function LoginPage({
         <p className="mt-1 text-sm text-brand-dark/60">
           Accédez à l&apos;espace de gestion de votre restaurant.
         </p>
+
+        {searchParams.error && (
+          <p className="mt-4 rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            ⚠️ {searchParams.error}
+          </p>
+        )}
 
         <form action={signIn} className="mt-6 space-y-4">
           <div>
@@ -36,16 +43,12 @@ export default function LoginPage({
             />
           </div>
 
-          {searchParams.error && (
-            <p className="text-sm text-red-600">{searchParams.error}</p>
-          )}
-
-          <button
-            type="submit"
-            className="w-full rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand/90"
+          <SubmitButton
+            pendingText="Connexion en cours..."
+            className="w-full rounded-full bg-brand px-6 py-3 font-semibold text-white transition hover:bg-brand/90 disabled:opacity-60"
           >
             Se connecter
-          </button>
+          </SubmitButton>
         </form>
 
         <p className="mt-6 text-center text-sm text-brand-dark/60">
