@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { FadeIn } from "@/components/FadeIn";
+import { Reveal } from "@/components/Reveal";
 
 const CHARCOAL = "#231C16";
 const WINE = "#6E2430";
@@ -49,6 +51,7 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="mx-auto grid max-w-5xl items-center gap-12 px-6 py-10 sm:grid-cols-[1.1fr_0.9fr] sm:py-16">
+        <FadeIn>
         <div>
           <p
             className="mb-5 inline-block rounded-full px-3 py-1 text-xs font-semibold"
@@ -80,10 +83,12 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
+        </FadeIn>
 
         {/* Carte illustrative */}
+        <FadeIn delay={0.15}>
         <div
-          className="rounded-2xl p-7 shadow-xl"
+          className="rounded-2xl p-7 shadow-xl transition hover:-translate-y-1"
           style={{ background: CHARCOAL, transform: "rotate(1.2deg)" }}
         >
           <p className="font-serif text-xs italic" style={{ color: GOLD }}>
@@ -116,28 +121,30 @@ export default function HomePage() {
             ✨ Page publique en ligne, modifiable par vous
           </div>
         </div>
+        </FadeIn>
       </section>
 
       {/* Features */}
       <section className="mx-auto max-w-3xl px-6 py-16">
         <div className="flex flex-col">
           {FEATURES.map((f, i) => (
-            <div
-              key={f.title}
-              className="flex items-start gap-4 py-4"
-              style={i > 0 ? { borderTop: "1px solid rgba(35,28,22,0.08)" } : undefined}
-            >
+            <Reveal key={f.title} delay={i * 0.08}>
               <div
-                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-base"
-                style={{ background: "rgba(110,36,48,0.08)" }}
+                className="flex items-start gap-4 py-4 transition hover:translate-x-1"
+                style={i > 0 ? { borderTop: "1px solid rgba(35,28,22,0.08)" } : undefined}
               >
-                {f.icon}
+                <div
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-base"
+                  style={{ background: "rgba(110,36,48,0.08)" }}
+                >
+                  {f.icon}
+                </div>
+                <div>
+                  <h3 className="text-[14.5px] font-semibold">{f.title}</h3>
+                  <p className="mt-0.5 text-[13px] leading-relaxed opacity-60">{f.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-[14.5px] font-semibold">{f.title}</h3>
-                <p className="mt-0.5 text-[13px] leading-relaxed opacity-60">{f.desc}</p>
-              </div>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -146,17 +153,22 @@ export default function HomePage() {
       <section className="mx-auto max-w-3xl px-6 py-10">
         <h2 className="mb-6 font-serif text-xl italic">Comment ça marche</h2>
         <div className="grid gap-5 sm:grid-cols-3">
-          {STEPS.map((s) => (
-            <div key={s.n} className="rounded-xl bg-white p-5" style={{ border: "1px solid rgba(35,28,22,0.08)" }}>
+          {STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.1}>
               <div
-                className="mb-3 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white"
-                style={{ background: WINE }}
+                className="rounded-xl bg-white p-5 transition hover:-translate-y-1"
+                style={{ border: "1px solid rgba(35,28,22,0.08)" }}
               >
-                {s.n}
+                <div
+                  className="mb-3 flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white"
+                  style={{ background: WINE }}
+                >
+                  {s.n}
+                </div>
+                <h3 className="text-[13.5px] font-semibold">{s.title}</h3>
+                <p className="mt-1 text-xs leading-relaxed opacity-60">{s.text}</p>
               </div>
-              <h3 className="text-[13.5px] font-semibold">{s.title}</h3>
-              <p className="mt-1 text-xs leading-relaxed opacity-60">{s.text}</p>
-            </div>
+            </Reveal>
           ))}
         </div>
       </section>
@@ -166,8 +178,9 @@ export default function HomePage() {
         <div className="mx-auto max-w-sm px-6 text-center">
           <h2 className="font-serif text-2xl italic">Un tarif simple</h2>
           <p className="mt-2 text-sm opacity-60">Sans engagement. Résiliable à tout moment.</p>
+          <Reveal>
           <div
-            className="mt-6 rounded-xl p-7"
+            className="mt-6 rounded-xl p-7 transition hover:-translate-y-1"
             style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}
           >
             <p className="text-4xl font-bold">
@@ -194,6 +207,7 @@ export default function HomePage() {
               Je me lance
             </Link>
           </div>
+          </Reveal>
         </div>
       </section>
 
