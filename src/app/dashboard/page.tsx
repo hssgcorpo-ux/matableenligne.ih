@@ -1,7 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { addMenuItem, deleteMenuItem, signOut, updateRestaurant } from "@/app/actions";
-import type { MenuItem, Restaurant } from "@/lib/types";
+import {
+  addMenuItem,
+  addRestaurantPhoto,
+  deleteMenuItem,
+  deleteRestaurantPhoto,
+  signOut,
+  updateRestaurant,
+} from "@/app/actions";
+import type { MenuItem, Restaurant, RestaurantPhoto } from "@/lib/types";
 import { THEMES } from "@/lib/themes";
 import { ImageUpload } from "@/components/ImageUpload";
 import { SubmitButton } from "@/components/SubmitButton";
@@ -35,6 +42,13 @@ export default async function DashboardPage({
     .order("category", { ascending: true })
     .order("position", { ascending: true })
     .returns<MenuItem[]>();
+
+  const { data: photos } = await supabase
+    .from("restaurant_photos")
+    .select("*")
+    .eq("restaurant_id", restaurant.id)
+    .order("position", { ascending: true })
+    .returns<RestaurantPhoto[]>();
 
   const publicUrl = `/${restaurant.slug}`;
 
@@ -151,14 +165,26 @@ export default async function DashboardPage({
           <ul className="mt-6 divide-y divide-brand-dark/5">
             {(menuItems ?? []).map((item) => (
               <li key={item.id} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-brand/80">
-                    {item.category}
-                  </p>
-                  <p className="font-medium">{item.name}</p>
-                  {item.description && (
-                    <p className="text-sm text-brand-dark/60">{item.description}</p>
+                <div className="flex items-center gap-3">
+                  {item.image_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={item.image_url}
+                      alt={item.name}
+                      className="h-14 w-14 rounded-lg object-cover"
+                    />
+                  ) : (
+                    <div className="h-14 w-14 rounded-lg bg-brand-cream" />
                   )}
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-brand/80">
+                      {item.category}
+                    </p>
+                    <p className="font-medium">{item.name}</p>
+                    {item.description && (
+                      <p className="text-sm text-brand-dark/60">{item.description}</p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <span className="font-semibold">{Number(item.price).toFixed(2)} €</span>
@@ -207,9 +233,58 @@ export default async function DashboardPage({
               placeholder="Prix €"
               className="rounded-lg border border-brand-dark/15 px-3 py-2 text-sm outline-none focus:border-brand"
             />
+            <div className="sm:col-span-4">
+              <ImageUpload label="Photo du plat (optionnel)" name="image_url" defaultValue="" />
+            </div>
             <button className="rounded-full bg-brand-dark px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark/90 sm:col-span-4 sm:w-fit">
               Ajouter au menu
             </button>
+          </form>
+        </section>
+
+        {/* Galerie photos */}
+        <section className="rounded-2xl bg-white p-6 shadow-sm">
+          <h2 className="font-serif text-xl font-bold">Galerie photos</h2>
+          <p className="mt-1 text-sm text-brand-dark/60">
+            Ajoutez des photos de votre restaurant, de la salle, de l&apos;ambiance... Elles
+            apparaissent dans une galerie sur votre page publique.
+          </p>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {(photos ?? []).map((photo) => (
+              <div key={photo.id} className="group relative">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={photo.image_url}
+                  alt=""
+                  className="h-32 w-full rounded-lg object-cover"
+                />
+                <form action={deleteRestaurantPhoto} className="absolute right-1.5 top-1.5">
+                  <input type="hidden" name="id" value={photo.id} />
+                  <button
+                    className="rounded-full bg-black/60 px-2 py-1 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100"
+                    title="Supprimer cette photo"
+                  >
+                    ✕
+                  </button>
+                </form>
+              </div>
+            ))}
+            {(!photos || photos.length === 0) && (
+              <p className="col-span-full text-sm text-brand-dark/50">
+                Aucune photo pour l&apos;instant.
+              </p>
+            )}
+          </div>
+
+          <form action={addRestaurantPhoto} className="mt-6 rounded-xl bg-brand-cream p-4">
+            <ImageUpload label="Ajouter une photo" name="image_url" defaultValue="" />
+            <SubmitButton
+              pendingText="Ajout en cours..."
+              className="mt-3 rounded-full bg-brand-dark px-5 py-2 text-sm font-semibold text-white transition hover:bg-brand-dark/90 disabled:opacity-60"
+            >
+              Ajouter à la galerie
+            </SubmitButton>
           </form>
         </section>
       </div>

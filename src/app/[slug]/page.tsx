@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import type { MenuItem, Restaurant } from "@/lib/types";
+import type { MenuItem, Restaurant, RestaurantPhoto } from "@/lib/types";
 import { getTheme } from "@/lib/themes";
 
 export const revalidate = 60;
@@ -27,6 +27,13 @@ export default async function RestaurantPage({
     .order("category", { ascending: true })
     .order("position", { ascending: true })
     .returns<MenuItem[]>();
+
+  const { data: photos } = await supabase
+    .from("restaurant_photos")
+    .select("*")
+    .eq("restaurant_id", restaurant.id)
+    .order("position", { ascending: true })
+    .returns<RestaurantPhoto[]>();
 
   const groups = new Map<string, MenuItem[]>();
   for (const item of menuItems ?? []) {
@@ -89,13 +96,23 @@ export default async function RestaurantPage({
                 <ul className="space-y-4">
                   {items.map((item) => (
                     <li key={item.id} className="flex items-baseline justify-between gap-4">
-                      <div>
-                        <p className="font-medium">{item.name}</p>
-                        {item.description && (
-                          <p className="text-sm text-brand-dark/60">
-                            {item.description}
-                          </p>
+                      <div className="flex items-start gap-3">
+                        {item.image_url && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={item.image_url}
+                            alt={item.name}
+                            className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                          />
                         )}
+                        <div>
+                          <p className="font-medium">{item.name}</p>
+                          {item.description && (
+                            <p className="text-sm text-brand-dark/60">
+                              {item.description}
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <span className="whitespace-nowrap font-semibold">
                         {Number(item.price).toFixed(2)} €
@@ -104,6 +121,26 @@ export default async function RestaurantPage({
                   ))}
                 </ul>
               </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Galerie */}
+      {photos && photos.length > 0 && (
+        <section className="mx-auto max-w-4xl px-6 py-8">
+          <h2 className="mb-6 text-center font-serif text-3xl font-bold">
+            Galerie
+          </h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {photos.map((photo) => (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                key={photo.id}
+                src={photo.image_url}
+                alt=""
+                className="h-40 w-full rounded-xl object-cover sm:h-52"
+              />
             ))}
           </div>
         </section>

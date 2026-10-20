@@ -34,11 +34,25 @@ create table if not exists public.menu_items (
   description text,
   price numeric(10, 2) not null default 0,
   position integer not null default 0,
+  image_url text,
+  created_at timestamptz not null default now()
+);
+
+-- Ajoute la colonne photo si la table existait déjà sans elle
+alter table public.menu_items add column if not exists image_url text;
+
+-- Table de la galerie photo du restaurant (plusieurs photos libres)
+create table if not exists public.restaurant_photos (
+  id uuid primary key default gen_random_uuid(),
+  restaurant_id uuid not null references public.restaurants(id) on delete cascade,
+  image_url text not null,
+  position integer not null default 0,
   created_at timestamptz not null default now()
 );
 
 create index if not exists menu_items_restaurant_id_idx on public.menu_items(restaurant_id);
 create index if not exists restaurants_slug_idx on public.restaurants(slug);
+create index if not exists restaurant_photos_restaurant_id_idx on public.restaurant_photos(restaurant_id);
 
 -- ============================================================
 -- Sécurité (Row Level Security) : chacun ne gère que SON restaurant,
@@ -47,6 +61,7 @@ create index if not exists restaurants_slug_idx on public.restaurants(slug);
 
 alter table public.restaurants enable row level security;
 alter table public.menu_items enable row level security;
+alter table public.restaurant_photos enable row level security;
 
 -- Tout le monde peut voir les restaurants (page publique)
 create policy "restaurants_public_read"
@@ -96,6 +111,31 @@ create policy "menu_items_owner_update"
 -- Seul le propriétaire du restaurant peut supprimer ses plats
 create policy "menu_items_owner_delete"
   on public.menu_items for delete
+  using (
+    exists (
+      select 1 from public.restaurants r
+      where r.id = restaurant_id and r.user_id = auth.uid()
+    )
+  );
+
+-- Tout le monde peut voir la galerie (page publique)
+create policy "restaurant_photos_public_read"
+  on public.restaurant_photos for select
+  using (true);
+
+-- Seul le propriétaire du restaurant peut ajouter des photos
+create policy "restaurant_photos_owner_insert"
+  on public.restaurant_photos for insert
+  with check (
+    exists (
+      select 1 from public.restaurants r
+      where r.id = restaurant_id and r.user_id = auth.uid()
+    )
+  );
+
+-- Seul le propriétaire du restaurant peut supprimer des photos
+create policy "restaurant_photos_owner_delete"
+  on public.restaurant_photos for delete
   using (
     exists (
       select 1 from public.restaurants r

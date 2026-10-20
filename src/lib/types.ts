@@ -22,4 +22,12 @@ export type MenuItem = {
   description: string | null;
   price: number;
   position: number;
+  image_url: string | null;
+};
+
+export type RestaurantPhoto = {
+  id: string;
+  restaurant_id: string;
+  image_url: string;
+  position: number;
 };

@@ -164,6 +164,7 @@ export async function addMenuItem(formData: FormData) {
     name: String(formData.get("name") || ""),
     description: String(formData.get("description") || ""),
     price: Number(formData.get("price") || 0),
+    image_url: String(formData.get("image_url") || "") || null,
   });
 
   if (error) {
@@ -182,6 +183,62 @@ export async function deleteMenuItem(formData: FormData) {
 
   const id = String(formData.get("id") || "");
   const { error } = await supabase.from("menu_items").delete().eq("id", id);
+
+  if (error) {
+    redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/dashboard");
+}
+
+// --- GALERIE PHOTO ---------------------------------------------
+
+export async function addRestaurantPhoto(formData: FormData) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("id")
+    .eq("user_id", user.id)
+    .single();
+
+  if (!restaurant) {
+    redirect("/dashboard?error=Restaurant%20introuvable.");
+  }
+
+  const imageUrl = String(formData.get("image_url") || "");
+  if (!imageUrl) {
+    redirect("/dashboard?error=Choisissez%20une%20image%20avant%20d'ajouter.");
+  }
+
+  const { error } = await supabase.from("restaurant_photos").insert({
+    restaurant_id: restaurant.id,
+    image_url: imageUrl,
+  });
+
+  if (error) {
+    redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/dashboard");
+}
+
+export async function deleteRestaurantPhoto(formData: FormData) {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const id = String(formData.get("id") || "");
+  const { error } = await supabase
+    .from("restaurant_photos")
+    .delete()
+    .eq("id", id);
 
   if (error) {
     redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);

@@ -26,6 +26,30 @@ export const THEMES = {
     heroBg: "bg-slate-900",
     accent: "text-sky-600",
   },
+  chaleureux: {
+    label: "Chaleureux (orange brûlé)",
+    pageBg: "bg-orange-50",
+    heroBg: "bg-orange-900",
+    accent: "text-orange-600",
+  },
+  romantique: {
+    label: "Romantique (bordeaux)",
+    pageBg: "bg-rose-50",
+    heroBg: "bg-rose-950",
+    accent: "text-rose-600",
+  },
+  ocean: {
+    label: "Océan (bleu-vert)",
+    pageBg: "bg-teal-50",
+    heroBg: "bg-teal-900",
+    accent: "text-teal-600",
+  },
+  rustique: {
+    label: "Rustique (bois & pierre)",
+    pageBg: "bg-stone-100",
+    heroBg: "bg-stone-800",
+    accent: "text-stone-600",
+  },
 } as const;
 
 export type ThemeName = keyof typeof THEMES;
