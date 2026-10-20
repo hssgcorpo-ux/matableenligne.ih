@@ -22,6 +22,23 @@ export default async function RestaurantPage({
 
   if (!restaurant) notFound();
 
+  // La page publique n'est visible que si l'abonnement est actif — le
+  // restaurant peut préparer son site gratuitement, mais doit payer pour
+  // que ses clients puissent le voir.
+  if (restaurant.subscription_status !== "active") {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center bg-brand-cream px-6 text-center">
+        <p className="font-serif text-2xl font-bold text-brand-dark">
+          {restaurant.name}
+        </p>
+        <p className="mt-3 max-w-sm text-sm text-brand-dark/60">
+          Cette page n&apos;est pas encore en ligne. Le restaurant doit activer
+          son abonnement pour la publier.
+        </p>
+      </main>
+    );
+  }
+
   const { data: menuItems } = await supabase
     .from("menu_items")
     .select("*")

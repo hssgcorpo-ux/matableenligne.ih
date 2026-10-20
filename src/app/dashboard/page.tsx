@@ -109,8 +109,9 @@ export default async function DashboardPage({
           ) : (
             <div className="mt-4">
               <p className="text-sm text-brand-dark/60">
-                Votre site est en ligne, mais l&apos;abonnement n&apos;est pas encore
-                actif. 19€/mois + 49€ de mise en service, une seule fois.
+                Préparez votre site tranquillement (menu, photos, thème) — il
+                ne sera visible par vos clients qu&apos;une fois l&apos;abonnement
+                activé. 19€/mois + 49€ de mise en service, une seule fois.
               </p>
               <form action={createCheckoutSession} className="mt-3">
                 <SubmitButton
