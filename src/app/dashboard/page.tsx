@@ -127,6 +127,24 @@ export default async function DashboardPage({
               defaultValue={restaurant.logo_url ?? ""}
             />
 
+            <div className="sm:col-span-2 rounded-lg bg-brand-cream p-4">
+              <label className="block text-sm font-medium">
+                Nom de domaine personnalisé (optionnel)
+              </label>
+              <input
+                name="custom_domain"
+                defaultValue={restaurant.custom_domain ?? ""}
+                placeholder="www.monrestaurant.fr"
+                className="mt-1 w-full rounded-lg border border-brand-dark/15 px-3 py-2 text-sm outline-none focus:border-brand sm:w-80"
+              />
+              <p className="mt-2 text-xs text-brand-dark/60">
+                Si vous avez acheté un nom de domaine (chez OVH, Namecheap...), indiquez-le
+                ici puis demandez à l&apos;administrateur du site de l&apos;ajouter dans les
+                paramètres d&apos;hébergement et de vous donner les enregistrements DNS à
+                configurer chez votre registraire.
+              </p>
+            </div>
+
             <div className="sm:col-span-2">
               <label className="block text-sm font-medium">
                 Thème de la page

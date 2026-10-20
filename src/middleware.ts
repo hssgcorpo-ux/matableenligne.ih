@@ -29,6 +29,25 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // Si la requête arrive sur un nom de domaine personnalisé (pas le domaine
+  // Vercel principal), on cherche à quel restaurant il appartient et on
+  // affiche directement sa page publique, sans changer l'URL dans le
+  // navigateur du visiteur.
+  const host = request.headers.get("host") || "";
+  const isAppHost = host.endsWith("vercel.app") || host.includes("localhost");
+
+  if (!isAppHost && request.nextUrl.pathname === "/") {
+    const { data: restaurant } = await supabase
+      .from("restaurants")
+      .select("slug")
+      .eq("custom_domain", host)
+      .maybeSingle();
+
+    if (restaurant) {
+      return NextResponse.rewrite(new URL(`/${restaurant.slug}`, request.url));
+    }
+  }
+
   await supabase.auth.getUser();
 
   return response;

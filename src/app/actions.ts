@@ -123,6 +123,12 @@ export async function updateRestaurant(formData: FormData) {
     cover_image_url: String(formData.get("cover_image_url") || ""),
     logo_url: String(formData.get("logo_url") || ""),
     theme: String(formData.get("theme") || "classique"),
+    custom_domain:
+      String(formData.get("custom_domain") || "")
+        .trim()
+        .toLowerCase()
+        .replace(/^https?:\/\//, "")
+        .replace(/\/$/, "") || null,
     updated_at: new Date().toISOString(),
   };
 
@@ -132,6 +138,13 @@ export async function updateRestaurant(formData: FormData) {
     .eq("user_id", user.id);
 
   if (error) {
+    if (error.message.includes("duplicate key") || error.message.includes("custom_domain")) {
+      redirect(
+        `/dashboard?error=${encodeURIComponent(
+          "Ce nom de domaine est déjà utilisé par un autre restaurant."
+        )}`
+      );
+    }
     redirect(`/dashboard?error=${encodeURIComponent(error.message)}`);
   }
 

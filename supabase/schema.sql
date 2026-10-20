@@ -25,6 +25,9 @@ create table if not exists public.restaurants (
 -- Ajoute la colonne thème si la table existait déjà sans elle
 alter table public.restaurants add column if not exists theme text not null default 'classique';
 
+-- Nom de domaine personnalisé que le restaurant peut connecter (optionnel)
+alter table public.restaurants add column if not exists custom_domain text unique;
+
 -- Table des plats / éléments de menu, rattachés à un restaurant
 create table if not exists public.menu_items (
   id uuid primary key default gen_random_uuid(),

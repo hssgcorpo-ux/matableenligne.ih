@@ -12,6 +12,7 @@ export type Restaurant = {
   cover_image_url: string | null;
   logo_url: string | null;
   theme: string;
+  custom_domain: string | null;
 };
 
 export type MenuItem = {
