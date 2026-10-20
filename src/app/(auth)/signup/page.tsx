@@ -16,6 +16,12 @@ export default function SignupPage({
           Gratuit à créer, modifiable à tout moment.
         </p>
 
+        {searchParams.error && (
+          <p className="mt-4 rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            ⚠️ {searchParams.error}
+          </p>
+        )}
+
         <form action={signUp} className="mt-6 space-y-4">
           <div>
             <label className="block text-sm font-medium">
@@ -51,10 +57,6 @@ export default function SignupPage({
               placeholder="6 caractères minimum"
             />
           </div>
-
-          {searchParams.error && (
-            <p className="text-sm text-red-600">{searchParams.error}</p>
-          )}
 
           <button
             type="submit"

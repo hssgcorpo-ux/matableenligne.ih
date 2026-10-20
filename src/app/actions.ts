@@ -29,7 +29,27 @@ export async function signUp(formData: FormData) {
 
   if (authError || !authData.user) {
     const message = authError?.message || "Impossible de créer le compte.";
+    console.error("SIGNUP signUp error:", authError);
     redirect(`/signup?error=${encodeURIComponent(message)}`);
+  }
+
+  // Filet de sécurité : si aucune session n'a été ouverte automatiquement
+  // (selon la configuration Supabase), on se connecte explicitement pour
+  // que les requêtes suivantes passent bien en tant qu'utilisateur authentifié.
+  if (!authData.session) {
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (signInError) {
+      console.error("SIGNUP fallback signIn error:", signInError);
+      redirect(
+        `/signup?error=${encodeURIComponent(
+          "Compte créé, mais la connexion automatique a échoué : " +
+            signInError.message
+        )}`
+      );
+    }
   }
 
   // Génère un slug unique pour la page publique du restaurant
@@ -56,6 +76,7 @@ export async function signUp(formData: FormData) {
   });
 
   if (insertError) {
+    console.error("SIGNUP restaurant insert error:", insertError);
     redirect(`/signup?error=${encodeURIComponent(insertError.message)}`);
   }
 
