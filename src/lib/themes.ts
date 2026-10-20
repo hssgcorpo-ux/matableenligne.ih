@@ -1,54 +1,42 @@
-// Thèmes visuels disponibles pour la page publique d'un restaurant.
-// Chaque thème définit juste quelques classes Tailwind qui changent
-// l'ambiance générale (fond, couleur d'accent, fond du bandeau du haut).
+// Palettes visuelles sombres et élégantes pour la page publique d'un
+// restaurant, inspirées d'une vraie carte de restaurant : fond sombre,
+// touche dorée, typographie serif.
 export const THEMES = {
-  classique: {
-    label: "Classique (terracotta)",
-    pageBg: "bg-brand-cream",
-    heroBg: "bg-brand-dark",
-    accent: "text-brand",
+  bistrot: {
+    label: "Bistrot (bordeaux)",
+    bg: "#231C16",
+    accent: "#B4894F",
+    wine: "#6E2430",
   },
-  elegant: {
+  terroir: {
+    label: "Terroir (vert sombre)",
+    bg: "#1E2620",
+    accent: "#C9A876",
+    wine: "#3C4A3A",
+  },
+  azur: {
+    label: "Bord de mer (bleu nuit)",
+    bg: "#132228",
+    accent: "#D8B36A",
+    wine: "#1F4E5F",
+  },
+  noir: {
     label: "Élégant (noir & or)",
-    pageBg: "bg-neutral-100",
-    heroBg: "bg-black",
-    accent: "text-amber-600",
+    bg: "#14110F",
+    accent: "#D4AF37",
+    wine: "#2A2520",
   },
-  frais: {
-    label: "Frais (vert nature)",
-    pageBg: "bg-emerald-50",
-    heroBg: "bg-emerald-950",
-    accent: "text-emerald-600",
+  passion: {
+    label: "Passion (rouge profond)",
+    bg: "#1A0E0E",
+    accent: "#E8B86D",
+    wine: "#7A1F2B",
   },
-  moderne: {
-    label: "Moderne (bleu épuré)",
-    pageBg: "bg-slate-50",
-    heroBg: "bg-slate-900",
-    accent: "text-sky-600",
-  },
-  chaleureux: {
-    label: "Chaleureux (orange brûlé)",
-    pageBg: "bg-orange-50",
-    heroBg: "bg-orange-900",
-    accent: "text-orange-600",
-  },
-  romantique: {
-    label: "Romantique (bordeaux)",
-    pageBg: "bg-rose-50",
-    heroBg: "bg-rose-950",
-    accent: "text-rose-600",
-  },
-  ocean: {
-    label: "Océan (bleu-vert)",
-    pageBg: "bg-teal-50",
-    heroBg: "bg-teal-900",
-    accent: "text-teal-600",
-  },
-  rustique: {
-    label: "Rustique (bois & pierre)",
-    pageBg: "bg-stone-100",
-    heroBg: "bg-stone-800",
-    accent: "text-stone-600",
+  violette: {
+    label: "Violette (aubergine)",
+    bg: "#1C1420",
+    accent: "#C9A3D4",
+    wine: "#4A2E57",
   },
 } as const;
 
@@ -58,5 +46,13 @@ export function getTheme(name: string | null | undefined) {
   if (name && name in THEMES) {
     return THEMES[name as ThemeName];
   }
-  return THEMES.classique;
+  return THEMES.bistrot;
+}
+
+export function rgba(hex: string, alpha: number) {
+  const n = parseInt(hex.replace("#", ""), 16);
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return `rgba(${r},${g},${b},${alpha})`;
 }

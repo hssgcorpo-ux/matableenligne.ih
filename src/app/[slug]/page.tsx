@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import type { MenuItem, Restaurant, RestaurantPhoto } from "@/lib/types";
-import { getTheme } from "@/lib/themes";
+import { getTheme, rgba } from "@/lib/themes";
+import { Hero } from "@/components/Hero";
+import { Gallery } from "@/components/Gallery";
 
 export const revalidate = 60;
 
@@ -43,148 +45,135 @@ export default async function RestaurantPage({
   }
 
   const theme = getTheme(restaurant.theme);
+  const cream = "#F6EFE2";
 
   return (
-    <main className={`min-h-screen ${theme.pageBg}`}>
-      {/* Hero */}
-      <section
-        className={`flex min-h-[40vh] flex-col items-center justify-center ${theme.heroBg} px-6 text-center text-white`}
-        style={
-          restaurant.cover_image_url
-            ? {
-                backgroundImage: `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url(${restaurant.cover_image_url})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }
-            : undefined
-        }
+    <main
+      className="min-h-screen font-sans"
+      style={{ background: theme.bg, color: cream }}
+    >
+      {/* Barre de navigation sticky */}
+      <div
+        className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 backdrop-blur"
+        style={{ background: rgba(theme.bg, 0.85), borderBottom: `1px solid ${rgba(cream, 0.08)}` }}
       >
-        {restaurant.logo_url && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={restaurant.logo_url}
-            alt={restaurant.name}
-            className="mb-4 h-16 w-16 rounded-full object-cover"
-          />
-        )}
-        <h1 className="font-serif text-4xl font-bold sm:text-5xl">
+        <span className="font-serif text-sm font-semibold" style={{ color: theme.accent }}>
           {restaurant.name}
-        </h1>
-        {restaurant.tagline && (
-          <p className="mt-3 text-lg text-white/80">{restaurant.tagline}</p>
+        </span>
+        <div className="flex gap-5 text-xs">
+          {photos && photos.length > 0 && (
+            <a href="#galerie" className="opacity-70 hover:opacity-100">
+              Galerie
+            </a>
+          )}
+          {groups.size > 0 && (
+            <a href="#carte" className="opacity-70 hover:opacity-100">
+              La carte
+            </a>
+          )}
+          <a href="#contact" className="opacity-70 hover:opacity-100">
+            Contact
+          </a>
+        </div>
+      </div>
+
+      <Hero
+        name={restaurant.name}
+        tagline={restaurant.tagline}
+        logoUrl={restaurant.logo_url}
+        coverUrl={restaurant.cover_image_url}
+        accent={theme.accent}
+        wine={theme.wine}
+      />
+
+      <div className="mx-auto max-w-2xl px-6 py-10">
+        {restaurant.description && (
+          <p className="max-w-lg text-[15px] opacity-75">{restaurant.description}</p>
         )}
-      </section>
 
-      {restaurant.description && (
-        <section className="mx-auto max-w-2xl px-6 py-12 text-center">
-          <p className="text-brand-dark/80">{restaurant.description}</p>
-        </section>
-      )}
+        {/* Galerie */}
+        {photos && photos.length > 0 && (
+          <section id="galerie" className="mt-14 scroll-mt-20">
+            <h2 className="mb-5 font-serif text-lg italic" style={{ color: theme.accent }}>
+              L&apos;ambiance
+            </h2>
+            <Gallery photos={photos} accent={theme.accent} />
+          </section>
+        )}
 
-      {/* Menu */}
-      {groups.size > 0 && (
-        <section className="mx-auto max-w-2xl px-6 py-8">
-          <h2 className="mb-6 text-center font-serif text-3xl font-bold">
-            Notre carte
-          </h2>
-          <div className="space-y-10">
-            {Array.from(groups.entries()).map(([category, items]) => (
-              <div key={category}>
-                <h3 className={`mb-3 text-sm font-semibold uppercase tracking-widest ${theme.accent}`}>
-                  {category}
-                </h3>
-                <ul className="space-y-4">
-                  {items.map((item) => (
-                    <li key={item.id} className="flex items-baseline justify-between gap-4">
-                      <div className="flex items-start gap-3">
+        {/* Menu */}
+        {groups.size > 0 && (
+          <section id="carte" className="mt-16 scroll-mt-20">
+            <h2 className="mb-6 text-center font-serif text-3xl font-semibold">
+              Notre carte
+            </h2>
+            <div className="space-y-10">
+              {Array.from(groups.entries()).map(([category, items]) => (
+                <div key={category}>
+                  <h3
+                    className="mb-3 text-sm font-semibold uppercase tracking-widest"
+                    style={{ color: theme.accent }}
+                  >
+                    {category}
+                  </h3>
+                  <ul className="space-y-4">
+                    {items.map((item) => (
+                      <li key={item.id} className="flex items-baseline gap-4">
                         {item.image_url && (
                           // eslint-disable-next-line @next/next/no-img-element
                           <img
                             src={item.image_url}
                             alt={item.name}
-                            className="h-16 w-16 shrink-0 rounded-lg object-cover"
+                            className="h-14 w-14 shrink-0 rounded-lg object-cover"
                           />
                         )}
-                        <div>
-                          <p className="font-medium">{item.name}</p>
-                          {item.description && (
-                            <p className="text-sm text-brand-dark/60">
-                              {item.description}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                      <span className="whitespace-nowrap font-semibold">
-                        {Number(item.price).toFixed(2)} €
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+                        <span className="font-medium">{item.name}</span>
+                        <span
+                          className="flex-1 border-b border-dotted"
+                          style={{ borderColor: rgba(cream, 0.25), position: "relative", top: -3 }}
+                        />
+                        <span className="whitespace-nowrap font-serif" style={{ color: theme.accent }}>
+                          {Number(item.price).toFixed(2)} €
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
-      {/* Galerie */}
-      {photos && photos.length > 0 && (
-        <section className="mx-auto max-w-4xl px-6 py-8">
-          <h2 className="mb-6 text-center font-serif text-3xl font-bold">
-            Galerie
-          </h2>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {photos.map((photo) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={photo.id}
-                src={photo.image_url}
-                alt=""
-                className="h-40 w-full rounded-xl object-cover sm:h-52"
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Infos pratiques */}
-      <section className="mx-auto max-w-2xl px-6 py-12">
-        <div className="grid gap-6 rounded-2xl bg-white p-6 shadow-sm sm:grid-cols-2">
+        {/* Contact */}
+        <section
+          id="contact"
+          className="mt-16 flex flex-wrap gap-6 border-t pt-8 text-sm opacity-80 scroll-mt-20"
+          style={{ borderColor: rgba(cream, 0.1) }}
+        >
           {restaurant.address && (
-            <div>
-              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
-                Adresse
-              </p>
-              <p className="mt-1">{restaurant.address}</p>
-            </div>
-          )}
-          {restaurant.opening_hours && (
-            <div>
-              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
-                Horaires
-              </p>
-              <p className="mt-1 whitespace-pre-line">{restaurant.opening_hours}</p>
-            </div>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                restaurant.address
+              )}`}
+              target="_blank"
+              className="underline-offset-4 hover:underline"
+            >
+              📍 {restaurant.address}
+            </a>
           )}
           {restaurant.phone && (
-            <div>
-              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
-                Téléphone
-              </p>
-              <p className="mt-1">{restaurant.phone}</p>
-            </div>
+            <a href={`tel:${restaurant.phone.replace(/\s+/g, "")}`} className="underline-offset-4 hover:underline">
+              📞 {restaurant.phone}
+            </a>
           )}
-          {restaurant.email && (
-            <div>
-              <p className={`text-sm font-semibold uppercase tracking-wide ${theme.accent}`}>
-                Email
-              </p>
-              <p className="mt-1">{restaurant.email}</p>
-            </div>
+          {restaurant.email && <span>✉️ {restaurant.email}</span>}
+          {restaurant.opening_hours && (
+            <span className="whitespace-pre-line">🕐 {restaurant.opening_hours}</span>
           )}
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <footer className="pb-10 text-center text-xs text-brand-dark/40">
+      <footer className="pb-10 text-center text-xs opacity-40">
         Site propulsé par TableEnLigne
       </footer>
     </main>
