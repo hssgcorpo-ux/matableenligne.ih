@@ -152,7 +152,10 @@ export async function updateRestaurant(formData: FormData) {
     .eq("user_id", user.id);
 
   if (error) {
-    if (error.message.includes("duplicate key") || error.message.includes("custom_domain")) {
+    console.error("UPDATE RESTAURANT error:", error);
+    // Code Postgres 23505 = violation de contrainte "unique" (ex: nom de
+    // domaine déjà pris par un autre restaurant).
+    if (error.code === "23505") {
       redirect(
         `/dashboard?error=${encodeURIComponent(
           "Ce nom de domaine est déjà utilisé par un autre restaurant."
