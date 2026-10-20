@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-06-20",
+    apiVersion: "2025-02-24.acacia",
   });
 }
 
