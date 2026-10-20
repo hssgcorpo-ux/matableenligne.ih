@@ -276,34 +276,43 @@ export async function createCheckoutSession() {
   const stripe = getStripe();
   const baseUrl = getBaseUrl();
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    customer_email: restaurant.email || user.email || undefined,
-    line_items: [
-      {
-        price_data: {
-          currency: "eur",
-          product_data: { name: "Abonnement TableEnLigne" },
-          unit_amount: 1900,
-          recurring: { interval: "month" },
+  let session: Stripe.Checkout.Session;
+  try {
+    session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      customer_email: restaurant.email || user.email || undefined,
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: { name: "Abonnement TableEnLigne" },
+            unit_amount: 1900,
+            recurring: { interval: "month" },
+          },
+          quantity: 1,
         },
-        quantity: 1,
-      },
-      {
-        price_data: {
-          currency: "eur",
-          product_data: { name: "Mise en service (paiement unique)" },
-          unit_amount: 4900,
+        {
+          price_data: {
+            currency: "eur",
+            product_data: { name: "Mise en service (paiement unique)" },
+            unit_amount: 4900,
+          },
+          quantity: 1,
         },
-        quantity: 1,
-      },
-    ],
-    success_url: `${baseUrl}/dashboard?success=paiement`,
-    cancel_url: `${baseUrl}/dashboard?error=${encodeURIComponent(
-      "Paiement annulé."
-    )}`,
-    metadata: { restaurant_id: restaurant.id },
-  });
+      ],
+      success_url: `${baseUrl}/dashboard?success=paiement`,
+      cancel_url: `${baseUrl}/dashboard?error=${encodeURIComponent(
+        "Paiement annulé."
+      )}`,
+      metadata: { restaurant_id: restaurant.id },
+    });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Erreur inconnue.";
+    console.error("STRIPE checkout.sessions.create error:", err);
+    redirect(
+      `/dashboard?error=${encodeURIComponent("Erreur Stripe : " + message)}`
+    );
+  }
 
   if (session.url) redirect(session.url);
   redirect("/dashboard?error=Impossible%20de%20démarrer%20le%20paiement.");

@@ -98,9 +98,12 @@ export default async function DashboardPage({
                 ✅ Abonnement actif — 19€/mois
               </p>
               <form action={createPortalSession}>
-                <button className="rounded-full border border-brand-dark/20 px-5 py-2 text-sm font-semibold transition hover:bg-brand-dark/5">
+                <SubmitButton
+                  pendingText="Ouverture..."
+                  className="rounded-full border border-brand-dark/20 px-5 py-2 text-sm font-semibold transition hover:bg-brand-dark/5 disabled:opacity-60"
+                >
                   Gérer mon abonnement
-                </button>
+                </SubmitButton>
               </form>
             </div>
           ) : (
@@ -110,9 +113,12 @@ export default async function DashboardPage({
                 actif. 19€/mois + 49€ de mise en service, une seule fois.
               </p>
               <form action={createCheckoutSession} className="mt-3">
-                <button className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90">
+                <SubmitButton
+                  pendingText="Redirection vers le paiement..."
+                  className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90 disabled:opacity-60"
+                >
                   Activer mon abonnement
-                </button>
+                </SubmitButton>
               </form>
             </div>
           )}
