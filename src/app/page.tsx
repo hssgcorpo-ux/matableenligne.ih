@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { FadeIn } from "@/components/FadeIn";
 import { Reveal } from "@/components/Reveal";
+import { CurtainReveal } from "@/components/CurtainReveal";
+import { StaggerText } from "@/components/StaggerText";
 
 const CHARCOAL = "#231C16";
 const WINE = "#6E2430";
@@ -38,6 +40,7 @@ const STEPS = [
 
 export default function HomePage() {
   return (
+    <CurtainReveal>
     <main style={{ background: CREAM, color: CHARCOAL }}>
       {/* Nav */}
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
@@ -51,17 +54,19 @@ export default function HomePage() {
 
       {/* Hero */}
       <section className="mx-auto grid max-w-5xl items-center gap-12 px-6 py-10 sm:grid-cols-[1.1fr_0.9fr] sm:py-16">
-        <FadeIn>
         <div>
+          <FadeIn delay={1.1}>
           <p
             className="mb-5 inline-block rounded-full px-3 py-1 text-xs font-semibold"
             style={{ color: WINE, background: "rgba(110,36,48,0.08)" }}
           >
             Pensé pour les restaurants indépendants
           </p>
+          </FadeIn>
           <h1 className="font-serif text-4xl font-semibold leading-tight sm:text-5xl">
-            Votre restaurant mérite mieux qu&apos;une page Facebook.
+            <StaggerText text="Votre restaurant mérite mieux qu'une page Facebook." />
           </h1>
+          <FadeIn delay={2.0}>
           <p className="mt-5 max-w-md text-[15.5px] leading-relaxed opacity-70">
             Un site élégant que vous gérez vous-même — menu, photos, thème —
             en ligne en quelques minutes. 19€/mois, sans engagement.
@@ -82,11 +87,11 @@ export default function HomePage() {
               J&apos;ai déjà un compte
             </Link>
           </div>
+          </FadeIn>
         </div>
-        </FadeIn>
 
         {/* Carte illustrative */}
-        <FadeIn delay={0.15}>
+        <FadeIn delay={1.35}>
         <div
           className="rounded-2xl p-7 shadow-xl transition hover:-translate-y-1"
           style={{ background: CHARCOAL, transform: "rotate(1.2deg)" }}
@@ -224,5 +229,6 @@ export default function HomePage() {
         </p>
       </footer>
     </main>
+    </CurtainReveal>
   );
 }
