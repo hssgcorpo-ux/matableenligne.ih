@@ -3,6 +3,7 @@ import { FadeIn } from "@/components/FadeIn";
 import { Reveal } from "@/components/Reveal";
 import { CurtainReveal } from "@/components/CurtainReveal";
 import { StaggerText } from "@/components/StaggerText";
+import { Logo } from "@/components/Logo";
 
 const CHARCOAL = "#231C16";
 const WINE = "#6E2430";
@@ -44,8 +45,9 @@ export default function HomePage() {
     <main style={{ background: CREAM, color: CHARCOAL }}>
       {/* Nav */}
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-        <span className="font-serif text-lg font-bold" style={{ color: WINE }}>
-          🍽️ TableEnLigne
+        <span className="flex items-center gap-2 font-serif text-lg font-bold" style={{ color: WINE }}>
+          <Logo color={WINE} size={20} />
+          TableEnLigne
         </span>
         <Link href="/login" className="text-sm font-medium hover:underline">
           Se connecter

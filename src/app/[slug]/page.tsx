@@ -1,12 +1,50 @@
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import type { MenuItem, Restaurant, RestaurantPhoto } from "@/lib/types";
 import { getTheme, rgba } from "@/lib/themes";
 import { Hero } from "@/components/Hero";
 import { Gallery } from "@/components/Gallery";
 import { Reveal } from "@/components/Reveal";
+import { Logo } from "@/components/Logo";
 
 export const revalidate = 60;
+
+export async function generateMetadata({
+  params,
+}: {
+  params: { slug: string };
+}): Promise<Metadata> {
+  const supabase = createClient();
+  const { data: restaurant } = await supabase
+    .from("restaurants")
+    .select("name, tagline, description, address, cover_image_url, subscription_status")
+    .eq("slug", params.slug)
+    .maybeSingle<Restaurant>();
+
+  if (!restaurant || restaurant.subscription_status !== "active") {
+    return { title: "TableEnLigne" };
+  }
+
+  const title = restaurant.tagline
+    ? `${restaurant.name} — ${restaurant.tagline}`
+    : restaurant.name;
+  const description =
+    restaurant.description?.slice(0, 155) ||
+    `Découvrez le menu, les photos et les horaires de ${restaurant.name}${
+      restaurant.address ? ` à ${restaurant.address}` : ""
+    }.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: restaurant.cover_image_url ? [restaurant.cover_image_url] : undefined,
+    },
+  };
+}
 
 export default async function RestaurantPage({
   params,
@@ -93,7 +131,8 @@ export default async function RestaurantPage({
         className="sticky top-0 z-10 flex items-center justify-between px-6 py-3 backdrop-blur"
         style={{ background: rgba(theme.bg, 0.85), borderBottom: `1px solid ${rgba(cream, 0.08)}` }}
       >
-        <span className="font-serif text-sm font-semibold" style={{ color: theme.accent }}>
+        <span className="flex items-center gap-2 font-serif text-sm font-semibold" style={{ color: theme.accent }}>
+          <Logo color={theme.accent} size={16} />
           {restaurant.name}
         </span>
         <div className="flex gap-5 text-xs">

@@ -26,7 +26,7 @@ export default function OgImage() {
             marginBottom: 18,
           }}
         >
-          🍽️ TABLEENLIGNE
+          TABLEENLIGNE
         </div>
         <div
           style={{
