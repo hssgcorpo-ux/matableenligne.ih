@@ -117,6 +117,53 @@ export async function signOut() {
   redirect("/");
 }
 
+// --- MOT DE PASSE OUBLIÉ ----------------------------------------
+
+export async function requestPasswordReset(formData: FormData) {
+  const email = String(formData.get("email") || "");
+  const supabase = createClient();
+  const baseUrl = getBaseUrl();
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${baseUrl}/auth/callback?next=/reset-password`,
+  });
+
+  if (error) {
+    redirect(`/forgot-password?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect("/forgot-password?success=1");
+}
+
+export async function updatePassword(formData: FormData) {
+  const password = String(formData.get("password") || "");
+  const confirm = String(formData.get("confirm") || "");
+
+  if (password.length < 6) {
+    redirect(
+      `/reset-password?error=${encodeURIComponent(
+        "Le mot de passe doit faire au moins 6 caractères."
+      )}`
+    );
+  }
+  if (password !== confirm) {
+    redirect(
+      `/reset-password?error=${encodeURIComponent(
+        "Les deux mots de passe ne correspondent pas."
+      )}`
+    );
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    redirect(`/reset-password?error=${encodeURIComponent(error.message)}`);
+  }
+
+  redirect("/login?success=motdepassechange");
+}
+
 // --- RESTAURANT -----------------------------------------------
 
 export async function updateRestaurant(formData: FormData) {

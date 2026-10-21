@@ -5,7 +5,7 @@ import { SubmitButton } from "@/components/SubmitButton";
 export default function LoginPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: { error?: string; success?: string };
 }) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-brand-cream px-6">
@@ -18,6 +18,11 @@ export default function LoginPage({
         {searchParams.error && (
           <p className="mt-4 rounded-lg border-2 border-red-400 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
             ⚠️ {searchParams.error}
+          </p>
+        )}
+        {searchParams.success === "motdepassechange" && (
+          <p className="mt-4 rounded-lg border-2 border-green-400 bg-green-50 px-4 py-3 text-sm font-semibold text-green-700">
+            ✅ Mot de passe changé, vous pouvez vous connecter.
           </p>
         )}
 
@@ -50,6 +55,12 @@ export default function LoginPage({
             Se connecter
           </SubmitButton>
         </form>
+
+        <p className="mt-3 text-center text-sm">
+          <Link href="/forgot-password" className="text-brand-dark/60 hover:underline">
+            Mot de passe oublié ?
+          </Link>
+        </p>
 
         <p className="mt-6 text-center text-sm text-brand-dark/60">
           Pas encore de compte ?{" "}
