@@ -16,6 +16,7 @@ export type Restaurant = {
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   subscription_status: string;
+  page_views: number;
 };
 
 export type MenuItem = {

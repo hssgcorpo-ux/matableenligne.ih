@@ -45,6 +45,12 @@ export default async function RestaurantPage({
     );
   }
 
+  // On compte une vue uniquement pour les vrais visiteurs, pas quand le
+  // propriétaire prévisualise sa propre page.
+  if (!isOwner) {
+    await supabase.rpc("increment_page_views", { target_id: restaurant.id });
+  }
+
   const { data: menuItems } = await supabase
     .from("menu_items")
     .select("*")

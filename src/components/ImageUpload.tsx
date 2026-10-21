@@ -21,7 +21,18 @@ export function ImageUpload({
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
+  const MAX_SIZE_MB = 5;
+
   async function uploadFile(file: File) {
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      setError(`Image trop lourde (max ${MAX_SIZE_MB} Mo).`);
+      return;
+    }
+    if (!file.type.startsWith("image/")) {
+      setError("Seules les images sont acceptées.");
+      return;
+    }
+
     setUploading(true);
     setError(null);
 
@@ -110,7 +121,7 @@ export function ImageUpload({
             />
           </label>
           <p className="mt-1 text-xs text-brand-dark/40">
-            ou glissez-déposez une image ici
+            ou glissez-déposez une image ici (max {MAX_SIZE_MB} Mo)
           </p>
         </div>
       </div>

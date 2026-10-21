@@ -186,3 +186,43 @@ create policy "restaurant_media_owner_delete"
     bucket_id = 'restaurant-media'
     and (storage.foldername(name))[1] = auth.uid()::text
   );
+
+-- ============================================================
+-- Messages de contact (formulaire public)
+-- ============================================================
+
+create table if not exists public.contact_messages (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  message text not null,
+  created_at timestamptz not null default now()
+);
+
+alter table public.contact_messages enable row level security;
+
+-- N'importe qui peut envoyer un message (formulaire public), mais personne
+-- ne peut les lire via l'API publique — seul l'admin (clé service_role,
+-- qui contourne RLS) y a accès.
+create policy "contact_messages_public_insert"
+  on public.contact_messages for insert
+  with check (true);
+
+-- ============================================================
+-- Compteur de vues de la page restaurant
+-- ============================================================
+
+alter table public.restaurants add column if not exists page_views integer not null default 0;
+
+-- Fonction pour incrémenter le compteur de vues sans passer par RLS
+-- (un visiteur anonyme n'a pas le droit de modifier la ligne du restaurant).
+create or replace function public.increment_page_views(target_id uuid)
+returns void
+language sql
+security definer
+set search_path = public
+as $$
+  update public.restaurants set page_views = page_views + 1 where id = target_id;
+$$;
+
+grant execute on function public.increment_page_views(uuid) to anon, authenticated;

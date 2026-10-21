@@ -117,6 +117,36 @@ export async function signOut() {
   redirect("/");
 }
 
+// --- CONTACT -----------------------------------------------------
+
+export async function submitContactMessage(formData: FormData) {
+  const name = String(formData.get("name") || "").trim();
+  const email = String(formData.get("email") || "").trim();
+  const message = String(formData.get("message") || "").trim();
+
+  if (!name || !email || !message) {
+    redirect(
+      `/contact?error=${encodeURIComponent("Merci de remplir tous les champs.")}`
+    );
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase
+    .from("contact_messages")
+    .insert({ name, email, message });
+
+  if (error) {
+    console.error("CONTACT insert error:", error);
+    redirect(
+      `/contact?error=${encodeURIComponent(
+        "Impossible d'envoyer le message, réessayez plus tard."
+      )}`
+    );
+  }
+
+  redirect("/contact?success=1");
+}
+
 // --- MOT DE PASSE OUBLIÉ ----------------------------------------
 
 export async function requestPasswordReset(formData: FormData) {

@@ -212,7 +212,16 @@ export default function HomePage() {
       </section>
 
       <footer className="py-8 text-center text-xs opacity-40">
-        © {new Date().getFullYear()} TableEnLigne — fait pour les restaurants indépendants.
+        <p>
+          © {new Date().getFullYear()} TableEnLigne — fait pour les restaurants indépendants.
+        </p>
+        <p className="mt-2 flex items-center justify-center gap-3">
+          <Link href="/contact" className="hover:underline">Contact</Link>
+          <span>·</span>
+          <Link href="/mentions-legales" className="hover:underline">Mentions légales</Link>
+          <span>·</span>
+          <Link href="/cgv" className="hover:underline">CGV</Link>
+        </p>
       </footer>
     </main>
   );

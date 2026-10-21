@@ -91,7 +91,14 @@ export default async function DashboardPage({
 
         {/* Abonnement */}
         <section className="rounded-2xl bg-white p-6 shadow-sm">
-          <h2 className="font-serif text-xl font-bold">Abonnement</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="font-serif text-xl font-bold">Abonnement</h2>
+            <p className="text-xs text-brand-dark/50">
+              👁️ {restaurant.page_views ?? 0} vue
+              {(restaurant.page_views ?? 0) > 1 ? "s" : ""} sur votre page
+            </p>
+          </div>
+
           {restaurant.subscription_status === "active" ? (
             <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
               <p className="text-sm text-green-700">
@@ -103,6 +110,25 @@ export default async function DashboardPage({
                   className="rounded-full border border-brand-dark/20 px-5 py-2 text-sm font-semibold transition hover:bg-brand-dark/5 disabled:opacity-60"
                 >
                   Gérer mon abonnement
+                </SubmitButton>
+              </form>
+            </div>
+          ) : restaurant.subscription_status === "canceled" ||
+            restaurant.subscription_status === "past_due" ||
+            restaurant.subscription_status === "unpaid" ? (
+            <div className="mt-4">
+              <p className="text-sm font-semibold text-red-600">
+                {restaurant.subscription_status === "canceled"
+                  ? "❌ Abonnement annulé"
+                  : "⚠️ Problème de paiement"}{" "}
+                — votre page n&apos;est plus visible par vos clients.
+              </p>
+              <form action={createCheckoutSession} className="mt-3">
+                <SubmitButton
+                  pendingText="Redirection vers le paiement..."
+                  className="rounded-full bg-brand px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand/90 disabled:opacity-60"
+                >
+                  Réactiver mon abonnement
                 </SubmitButton>
               </form>
             </div>
