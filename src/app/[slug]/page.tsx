@@ -4,6 +4,7 @@ import type { MenuItem, Restaurant, RestaurantPhoto } from "@/lib/types";
 import { getTheme, rgba } from "@/lib/themes";
 import { Hero } from "@/components/Hero";
 import { Gallery } from "@/components/Gallery";
+import { Reveal } from "@/components/Reveal";
 
 export const revalidate = 60;
 
@@ -117,15 +118,19 @@ export default async function RestaurantPage({
 
       <div className="mx-auto max-w-2xl px-6 py-10">
         {restaurant.description && (
-          <p className="max-w-lg text-[15px] opacity-75">{restaurant.description}</p>
+          <Reveal>
+            <p className="max-w-lg text-[15px] opacity-75">{restaurant.description}</p>
+          </Reveal>
         )}
 
         {/* Galerie */}
         {photos && photos.length > 0 && (
           <section id="galerie" className="mt-14 scroll-mt-20">
-            <h2 className="mb-5 font-serif text-lg italic" style={{ color: theme.accent }}>
-              L&apos;ambiance
-            </h2>
+            <Reveal>
+              <h2 className="mb-5 font-serif text-lg italic" style={{ color: theme.accent }}>
+                L&apos;ambiance
+              </h2>
+            </Reveal>
             <Gallery photos={photos} accent={theme.accent} />
           </section>
         )}
@@ -133,73 +138,85 @@ export default async function RestaurantPage({
         {/* Menu */}
         {groups.size > 0 && (
           <section id="carte" className="mt-16 scroll-mt-20">
-            <h2 className="mb-6 text-center font-serif text-3xl font-semibold">
-              Notre carte
-            </h2>
+            <Reveal>
+              <h2 className="mb-6 text-center font-serif text-3xl font-semibold">
+                Notre carte
+              </h2>
+            </Reveal>
             <div className="space-y-10">
-              {Array.from(groups.entries()).map(([category, items]) => (
-                <div key={category}>
-                  <h3
-                    className="mb-3 text-sm font-semibold uppercase tracking-widest"
-                    style={{ color: theme.accent }}
-                  >
-                    {category}
-                  </h3>
-                  <ul className="space-y-4">
-                    {items.map((item) => (
-                      <li key={item.id} className="flex items-baseline gap-4">
-                        {item.image_url && (
-                          // eslint-disable-next-line @next/next/no-img-element
-                          <img
-                            src={item.image_url}
-                            alt={item.name}
-                            className="h-14 w-14 shrink-0 rounded-lg object-cover"
+              {Array.from(groups.entries()).map(([category, items], i) => (
+                <Reveal key={category} delay={i * 0.08}>
+                  <div>
+                    <h3
+                      className="mb-3 text-sm font-semibold uppercase tracking-widest"
+                      style={{ color: theme.accent }}
+                    >
+                      {category}
+                    </h3>
+                    <ul className="space-y-4">
+                      {items.map((item) => (
+                        <li
+                          key={item.id}
+                          className="flex items-baseline gap-4 transition hover:translate-x-1"
+                        >
+                          {item.image_url && (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                              src={item.image_url}
+                              alt={item.name}
+                              className="h-14 w-14 shrink-0 rounded-lg object-cover"
+                            />
+                          )}
+                          <span className="font-medium">{item.name}</span>
+                          <span
+                            className="flex-1 border-b border-dotted"
+                            style={{ borderColor: rgba(cream, 0.25), position: "relative", top: -3 }}
                           />
-                        )}
-                        <span className="font-medium">{item.name}</span>
-                        <span
-                          className="flex-1 border-b border-dotted"
-                          style={{ borderColor: rgba(cream, 0.25), position: "relative", top: -3 }}
-                        />
-                        <span className="whitespace-nowrap font-serif" style={{ color: theme.accent }}>
-                          {Number(item.price).toFixed(2)} €
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                          <span className="whitespace-nowrap font-serif" style={{ color: theme.accent }}>
+                            {Number(item.price).toFixed(2)} €
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </Reveal>
               ))}
             </div>
           </section>
         )}
 
         {/* Contact */}
-        <section
-          id="contact"
-          className="mt-16 flex flex-wrap gap-6 border-t pt-8 text-sm opacity-80 scroll-mt-20"
-          style={{ borderColor: rgba(cream, 0.1) }}
-        >
-          {restaurant.address && (
-            <a
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                restaurant.address
-              )}`}
-              target="_blank"
-              className="underline-offset-4 hover:underline"
-            >
-              📍 {restaurant.address}
-            </a>
-          )}
-          {restaurant.phone && (
-            <a href={`tel:${restaurant.phone.replace(/\s+/g, "")}`} className="underline-offset-4 hover:underline">
-              📞 {restaurant.phone}
-            </a>
-          )}
-          {restaurant.email && <span>✉️ {restaurant.email}</span>}
-          {restaurant.opening_hours && (
-            <span className="whitespace-pre-line">🕐 {restaurant.opening_hours}</span>
-          )}
-        </section>
+        <Reveal>
+          <section
+            id="contact"
+            className="mt-16 flex flex-wrap gap-6 border-t pt-8 text-sm opacity-80 scroll-mt-20"
+            style={{ borderColor: rgba(cream, 0.1) }}
+          >
+            {restaurant.address && (
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  restaurant.address
+                )}`}
+                target="_blank"
+                className="underline-offset-4 hover:underline"
+              >
+                📍 {restaurant.address}
+              </a>
+            )}
+            {restaurant.phone && (
+              <a
+                href={`tel:${restaurant.phone.replace(/\s+/g, "")}`}
+                className="underline-offset-4 hover:underline"
+              >
+                📞 {restaurant.phone}
+              </a>
+            )}
+            {restaurant.email && <span>✉️ {restaurant.email}</span>}
+            {restaurant.opening_hours && (
+              <span className="whitespace-pre-line">🕐 {restaurant.opening_hours}</span>
+            )}
+          </section>
+        </Reveal>
       </div>
 
       <footer className="pb-10 text-center text-xs opacity-40">
